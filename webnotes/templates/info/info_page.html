@@ -1,0 +1,21 @@
+{% extends './../layout.html' %}
+
+{% block content %}
+
+{% if form.errors %}
+  {{ form.errors }}
+  <p class="mx-auto" style="width: max-content">Error has occured. Please try again.</p>
+{% endif %}
+
+<div class="mx-auto my-3 col-xs-12 col-sm-11 col-md-10 col-lg-9 col-xl-7">
+    {% for part in object_list %}
+    <h4>
+        {{ part.header }}
+    </h4>
+    <p>
+        {{ part.text_block }}
+    </p>
+    {% endfor %}
+</div>
+
+{% endblock %}

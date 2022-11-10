@@ -1,0 +1,55 @@
+{% extends './../layout.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+{% if form.errors %}
+  {{ form.errors }}
+  <p class="mx-auto" style="width: max-content">Error has occured. Please try again.</p>
+{% endif %}
+
+{% if next %}
+  {% if user.is_authenticated %}
+    <p class="mx-auto" style="width: max-content">Your account doesn't have access to this page. To proceed,
+    please login with an account that has access.</p>
+  {% else %}
+    <p class="mx-auto" style="width: max-content">Please login to see this page.</p>
+  {% endif %}
+{% endif %}
+
+<div class="mx-auto col-xs-12 col-sm-11 col-md-10 col-lg-9 col-xl-7">
+
+  <form method="POST" action="">
+    {% csrf_token %}
+    <fieldset class="form-group">
+      <legend class="border-bottom mb-4">Новая заметка</legend>
+
+      <label for="name-note" class="form-label">Название заметки</label>
+      <input type="text" class="form-control" value="{{ note.name }}" id="name-note" name="name">
+
+      <label for="text-note" class="form-label">Текст заметки</label>
+      <textarea class="form-control" id="text-note" rows="3" name="text">{{ note.text }}</textarea>
+
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="True" id="flexCheckDefault" name="favourites" {{ note.favourites_is_checked }}>
+        <label class="form-check-label" for="flexCheckDefault">В избранное</label>
+      </div>
+
+    </fieldset>
+    <div class="form-group">
+      <button class="btn btn-light mt-2 align-self-end" type="submit">Сохранить</button>
+    </div>
+  </form>
+
+  <!--<form method="POST">
+      {% csrf_token %}
+      <fieldset class="form-group">
+          <legend class="border-bottom mb-4">Новая заметка</legend>
+          {{ form|crispy }}
+      </fieldset>
+      <div class="form-group">
+          <button class="btn btn-light mt-2 align-self-end" type="submit">Сохранить</button>
+      </div>
+  </form>-->
+</div>
+
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends './../layout.html' %}
+{% load static %}
+{% block content %}
+
+<div class="m-3 px-2 col-xs-12 col-sm-11 col-md-10 col-lg-9 col-xl-7 mx-auto d-flex flex-column">
+    <div class="m-2 p-2 d-flex flex-row justify-content-between align-items-center border rounded">
+        <a href='new' class="href-new"></a>
+
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="type-sort-menu" data-bs-toggle="dropdown" aria-expanded="false">
+                Сортировать по
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="type-sort-menu">
+                <li><a class="dropdown-item" href="?sort=date">Сначала старые</a></li>
+                <li><a class="dropdown-item" href="?sort=-date">Сначала новые</a></li>
+                <li><a class="dropdown-item" href="?sort=text_more">Больше текста</a></li>
+                <li><a class="dropdown-item" href="?sort=text_less">Меньше текста</a></li>
+            </ul>
+        </div>
+    </div>
+
+{% for note in notes %}
+    <div class="m-2 p-2 d-flex flex-row align-items-center border rounded">
+        <!--<a href={{ note.id }} class="flex-grow-1 text-break" style="text-decoration: none">{{ note.name }}</a>-->
+        {% if note.favourites == True %}
+            <div class="star me-2"></div>
+        {% endif %}
+        <a type="button" data-bs-toggle="modal" data-bs-target="#modal{{ note.id }}" style="text-decoration: none" class="flex-grow-1 text-break">{{ note.name }}</a>
+
+        <form method="post" action="{% url 'notes:change_favourites' note.id %}" class="ms-2">
+            {% csrf_token %}
+            <button type="submit" class="btn-favourites"></button>
+        </form>
+
+        <a href={% url 'notes:note' note.id %} class="ms-2 btn-edit"></a>
+
+        <form method="post" action="{% url 'notes:delete' note.id %}" class="ms-2">
+            {% csrf_token %}
+            <button type="submit" class="btn-delete"></button>
+        </form>
+    </div>
+      <!-- Modal -->
+    <div class="modal fade" id="modal{{ note.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ note.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-wrap">
+                {{ note.text }}
+            </div>
+            <div class="modal-footer">
+                <a href="{% url 'notes:note' note.id %}" class="btn btn-outline-primary">Редактировать</a>
+        
+                <form method="post" action="{% url 'notes:delete' note.id %}" class="ms-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger">Удалить</button>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+</div>
+
+<style>
+    .star {
+        width: 20px;
+        height: 20px;
+        background-repeat: no-repeat;
+        background-color: white;
+        background-size: contain;
+        background-image: url("{% static 'icons/star.png' %}");
+    }
+    .btn-favourites {
+        border: none;
+        width: 20px;
+        height: 20px;
+        background-repeat: no-repeat;
+        background-color: white;
+        background-size: contain;
+        background-image: url("{% static 'icons/star-gray.png' %}");
+    }
+    .btn-favourites:hover {
+        background-image: url("{% static 'icons/star-gray-hover.png' %}");
+    }
+    .btn-delete {
+        border: none;
+        width: 20px;
+        height: 20px;
+        background-repeat: no-repeat;
+        background-color: white;
+        background-size: contain;
+        background-image: url("{% static 'icons/delete.png' %}");
+    }
+    .btn-delete:hover {
+        background-image: url("{% static 'icons/delete-hover.png' %}");
+    }
+    .btn-edit {
+        border: none;
+        width: 20px;
+        height: 20px;
+        background-repeat: no-repeat;
+        background-color: white;
+        background-size: contain;
+        background-image: url("{% static 'icons/edit.png' %}");
+    }
+    .btn-edit:hover {
+        background-image: url("{% static 'icons/edit-hover.png' %}");
+    }
+    .href-new {
+        width: 26px;
+        height: 26px;
+        background-repeat: no-repeat;
+        background-image: url("{% static 'icons/plus.png' %}");
+        background-size: contain;
+    }
+    .href-new:hover {
+        background-image: url("{% static 'icons/plus-hover.png' %}");
+    }
+</style>
+{% endblock %}

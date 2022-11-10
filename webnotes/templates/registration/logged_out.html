@@ -1,0 +1,9 @@
+{% extends './../layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="mx-auto mt-3 text-center">
+    <p>Вы вышли из аккаунта.</p>
+    <a href="{% url 'login'%}">Нажмите, чтобы войти снова.</a>
+</div>
+{% endblock %}
