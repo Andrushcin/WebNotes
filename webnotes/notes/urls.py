@@ -9,5 +9,4 @@ urlpatterns = [
     path('<int:pk>', login_required(ChangeNote.as_view()), name="note"),
     path('delete/<int:pk>', login_required(DeleteNote.as_view()), name="delete"),
     path('change_favourites/<int:pk>', login_required(ChangeFavourites.as_view()), name="change_favourites"),
-    #path('test', TestView.as_view(), name="test")
 ]
