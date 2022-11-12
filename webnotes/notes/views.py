@@ -34,7 +34,11 @@ class CreateNote(View):
         return HttpResponseRedirect('/notes/')
     
     def get(self, request):
-        return render(request, 'notes/change_note.html')
+        data = {
+            "legend":"Новая заметка",
+            "new": True,
+        }
+        return render(request, 'notes/change_note.html', data)
 
 
 class ChangeNote(View):
@@ -50,14 +54,21 @@ class ChangeNote(View):
             note.favourites = payload['favourites']
         else:
             note.favourites = False
+        
+        if 'date_missing' in payload.keys():
+            note.date_missing = payload['date_missing']
+
         note.save()
 
         return HttpResponseRedirect('/notes/')
 
     def get(self, request, pk):
         note = Note.objects.get(user=request.user, id = pk)
-
-        return render(request, 'notes/change_note.html', {'note': note})
+        data = {
+            'note': note,
+            'legend': "Редактирование заметки",
+        }
+        return render(request, 'notes/change_note.html', data)
 
 class DeleteNote(View):
 

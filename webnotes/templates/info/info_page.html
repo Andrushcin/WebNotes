@@ -9,10 +9,10 @@
 
 <div class="mx-auto my-3 col-xs-12 col-sm-11 col-md-10 col-lg-9 col-xl-7">
     {% for part in object_list %}
-    <h4>
+    <h4 class="text-dark border-bottom border-warning pb-1">
         {{ part.header }}
     </h4>
-    <p>
+    <p class="mb-3">
         {{ part.text_block }}
     </p>
     {% endfor %}

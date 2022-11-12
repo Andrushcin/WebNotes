@@ -16,29 +16,55 @@
   {% endif %}
 {% endif %}
 
-<div class="mx-auto col-xs-12 col-sm-11 col-md-10 col-lg-9 col-xl-7">
+<div class="mx-auto col-xs-12 col-sm-11 col-md-10 col-lg-9 col-xl-7 my-2 p-2">
 
-  <form method="POST" action="">
+  <form method="POST" action="" class="" id="edit">
     {% csrf_token %}
     <fieldset class="form-group">
-      <legend class="border-bottom mb-4">Новая заметка</legend>
+      <legend class="border-bottom border-warning mb-2">{{ legend }}</legend>
 
       <label for="name-note" class="form-label">Название заметки</label>
       <input type="text" class="form-control" value="{{ note.name }}" id="name-note" name="name">
 
       <label for="text-note" class="form-label">Текст заметки</label>
-      <textarea class="form-control" id="text-note" rows="3" name="text">{{ note.text }}</textarea>
+      <textarea class="form-control" id="text-note" rows="7" name="text" style="overflow: hidden">{{ note.text }}</textarea>
 
       <div class="form-check">
         <input class="form-check-input" type="checkbox" value="True" id="flexCheckDefault" name="favourites" {{ note.favourites_is_checked }}>
         <label class="form-check-label" for="flexCheckDefault">В избранное</label>
       </div>
+      <div class="d-flex flex-column">
+        <label for="date" class="form-label">Дата автоматического удаления</label>
+        <input type="datetime-local" id="date" name="date_missing" style="width: 130px">
+      </div>
 
     </fieldset>
-    <div class="form-group">
-      <button class="btn btn-light mt-2 align-self-end" type="submit">Сохранить</button>
-    </div>
   </form>
+  {% if not new %}
+  <form method="post" action="{% url 'notes:delete' note.id %}" class="ms-2" id="delete">
+    {% csrf_token %}
+  </form>
+  {% endif %}
+
+  <div class="d-flex flex-row justify-content-end">
+
+    <div class="form-group ms-2">
+      <input class="btn btn-primary mt-2 align-self-end" type="submit" value="Сохранить" form="edit">
+    </div>
+
+    {% if not new %}
+    <div class="form-group ms-2">
+      <input class="btn btn-danger mt-2 align-self-end" type="submit" value="Удалить" form="delete">
+    </div>
+    {% endif %}
+  </div>
+
+  {% if not new %}
+  <div class="mt-1">
+    <p class="dark">Создано: <span class="fw-bold">{{ note.date_create }}</span> пользователем <span class="fw-bold">{{ note.user }}</span></p>
+    <p class="dark">Последнее изменение: <span class="fw-bold">{{ note.date_update }}</span></p>
+  </div>
+  {% endif %}
 
   <!--<form method="POST">
       {% csrf_token %}
@@ -51,5 +77,14 @@
       </div>
   </form>-->
 </div>
+<script>
+var textarea = document.querySelector('textarea');
+textarea.style.height = textarea.scrollHeight + "px";
 
+textarea.addEventListener('keyup', function(){
+  if(this.scrollTop > 0){
+    this.style.height = this.scrollHeight + "px";
+  }
+});
+</script>
 {% endblock %}

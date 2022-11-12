@@ -1,5 +1,5 @@
 from django.db import models
-from datetime import timedelta
+from datetime import datetime
 
 # Create your models here.
 
@@ -10,7 +10,7 @@ class Note(models.Model):
     favourites = models.BooleanField('Добавить в избранное', default=False, blank=True)
     date_update = models.DateTimeField('Дата последнего изменения', auto_now=True)
     date_create = models.DateTimeField('Дата создания', auto_now_add=True)
-    life_time = models.DurationField('Время жизни', default=timedelta(days=36135))
+    date_missing = models.DateTimeField('Дата исчезновения', blank=True)
 
     def favourites_is_checked(self):
         if self.favourites == 1:

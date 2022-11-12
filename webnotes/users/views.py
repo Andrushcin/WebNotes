@@ -15,3 +15,15 @@ class RegisterView(View):
     def get(self, request):
         form = UserRegisterForm()
         return render(request, 'registration/register.html', {'form': form})
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            messages.success(request, f'Создан аккаунт {username}!')
+            return HttpResponseRedirect('/accounts/login')
+    else:
+        form = UserRegisterForm()
+    return render(request, 'registration/register.html', {'form': form})
