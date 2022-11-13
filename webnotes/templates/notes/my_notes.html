@@ -19,7 +19,9 @@
         </div>
 
     </div>
-
+{% for m in missed_notes %}
+{{ m }}
+{% endfor %}
 {% for note in notes %}
     <div class="my-1 p-2 d-flex flex-row align-items-center border border-dark rounded">
         <!--<a href={{ note.id }} class="flex-grow-1 text-break" style="text-decoration: none">{{ note.name }}</a>-->

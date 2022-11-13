@@ -1,13 +1,14 @@
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .models import Note
+from notes.models import Note
 from django.views import View
+from django.contrib.auth.models import User
+from datetime import datetime
 
 class MyNotes(View):
     def post(self, request):
         pass
-
     def get(self, request):
         try:
             order_by_param = request.GET['sort']
@@ -16,9 +17,25 @@ class MyNotes(View):
         except:
             order_by_param = '-date_update'
     
-        notes = Note.objects.filter(user=request.user).order_by(order_by_param)
+        #notes = Note.objects.filter(user=request.user).order_by(order_by_param)
+        user = User.objects.get(username=request.user)
+        notes = user.note_set.all().order_by(order_by_param)#.values_list('name', 'id', named=True)
+
+        missed_notes_ids = []
+        current_notes_ids = []
+        now = datetime.now()
+        for n in notes:
+            if n.date_missing < now:
+                missed_notes_ids.append(n.id)
+            else:
+                current_notes_ids.append(n.id)
+        
+        missed_notes = notes
+        missed_notes = missed_notes.filter(id__in=missed_notes_ids)
+        notes = notes.filter(id__in=current_notes_ids)
         data = {
             'notes': notes,
+            'missed_notes': missed_notes,
             }
         return render(request, 'notes/my_notes.html', data)
 
@@ -29,8 +46,9 @@ class CreateNote(View):
             favourites = payload['favourites']
         else:
             favourites = False
-
-        Note.objects.create(user=request.user, name=payload['name'], text=payload['text'], favourites=favourites)
+        
+        user = User.objects.get(username=request.user)
+        user.note_set.create(name=payload['name'], text=payload['text'], favourites=favourites, date_missing=payload['date_missing'])
         return HttpResponseRedirect('/notes/')
     
     def get(self, request):
@@ -44,12 +62,14 @@ class CreateNote(View):
 class ChangeNote(View):
 
     def post(self, request, pk):
-        note = Note.objects.get(user=request.user, id = pk)
+        user = User.objects.get(username=request.user)
+        note = user.note_set.get(id=pk)
 
         payload = request.POST.dict()
         print(payload)
         note.name = payload['name']
         note.text = payload['text']
+
         if 'favourites' in payload.keys():
             note.favourites = payload['favourites']
         else:
@@ -63,7 +83,8 @@ class ChangeNote(View):
         return HttpResponseRedirect('/notes/')
 
     def get(self, request, pk):
-        note = Note.objects.get(user=request.user, id = pk)
+        user = User.objects.get(username=request.user)
+        note = user.note_set.get(id=pk)
         data = {
             'note': note,
             'legend': "Редактирование заметки",
@@ -73,13 +94,15 @@ class ChangeNote(View):
 class DeleteNote(View):
 
     def post(self, request, pk):
-        note = Note.objects.get(user=request.user, id = pk)
+        user = User.objects.get(username=request.user)
+        note = user.note_set.get(id=pk)
         note.delete()
         return HttpResponseRedirect('/notes/')
 
 class ChangeFavourites(View):
     def post(self, request, pk):
-        note = Note.objects.get(user=request.user, id = pk)
+        user = User.objects.get(username=request.user)
+        note = user.note_set.get(id=pk)
 
         if note.favourites == False:
             note.favourites = True
