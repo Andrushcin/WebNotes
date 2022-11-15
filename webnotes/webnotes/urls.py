@@ -27,6 +27,6 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('info/', include('info.urls')),
-
+#    path("account/", include("account.urls")),
     path('add_notes/', AddView.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'users',
     'info',
     'crispy_forms',
+    'django.contrib.sites',
+#    'account',
+#    'bootstrap5'
 ]
 
 MIDDLEWARE = [
@@ -53,6 +56,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# MIDDLEWARE_CLASSES = [
+#     'account.middleware.LocaleMiddleware',
+#     'account.middleware.TimezoneMiddleware'
+# ]
 
 ROOT_URLCONF = 'webnotes.urls'
 
@@ -67,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+#                'account.context_processors.account'
             ],
         },
     },
@@ -126,8 +135,19 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_REDIRECT_URL = '/notes'
+#LOGIN_REDIRECT_URL = '/notes'
 
-LOGIN_URL = 'login'
+#LOGIN_URL = 'login'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# ACCOUNT_EMAIL_UNIQUE = True
+# ACCOUNT_EMAIL_CONFIRMATION_REQUIRED = True
+
+# SITE_ID = 2
+
+# DEFAULT_FROM_EMAIL = 'support@webnotes.ru'
+# EMAIL_HOST = "smtp.yoursmtpserver.ru"
+# EMAIL_PORT = 25
+# EMAIL_HOST_USER = "user"
+# EMAIL_HOST_PASSWORD = "pass"
