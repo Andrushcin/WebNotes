@@ -5,6 +5,8 @@ from notes.models import Note
 from django.views import View
 from django.contrib.auth.models import User
 from datetime import datetime
+from django.urls import reverse
+from methods import check_data_and_create_note
 
 class MyNotes(View):
     def post(self, request):
@@ -31,12 +33,10 @@ class MyNotes(View):
 
 class CreateNote(View):
     def post(self, request):
-        payload = request.POST.dict()
-        if 'favourites' in payload.keys() and isinstance(payload['date_missing'], datetime):
-            favourites = payload['favourites']
         
-        user = User.objects.get(username=request.user)
-        user.note_set.create(name=payload['name'], text=payload['text'], favourites=favourites, date_to_trash=payload['date_missing'])
+        check_data_and_create_note(request)
+        #user = User.objects.get(username=request.user)
+        #user.note_set.create(name=payload['name'], text=payload['text'], favourites=favourites, date_to_trash=payload['date_missing'])
         return HttpResponseRedirect('/notes/')
     
     def get(self, request):
@@ -61,10 +61,12 @@ class ChangeNote(View):
         if 'text' in payload.keys():   
             note.text = payload['text']
 
-        if 'favourites' in payload.keys() and isinstance(payload['favourites'], bool):
+        if 'favourites' in payload.keys():
             note.favourites = payload['favourites']
+        else:
+            note.favourites = False
         
-        if 'date_missing' in payload.keys() and isinstance(payload['date_missing'], datetime):
+        if 'date_missing' in payload.keys():
                 note.date_to_trash = payload['date_missing']
 
         note.save()
@@ -83,8 +85,8 @@ class DeleteNote(View):
     def post(self, request, pk):
         user = User.objects.get(username=request.user)
         note = user.note_set.get(id=pk)
-        note.to_trash()
-        return HttpResponseRedirect('/notes/')
+        note.delete()
+        return HttpResponseRedirect(reverse('notes:trash'))
 
 class ChangeFavourites(View):
     def post(self, request, pk):
@@ -124,7 +126,7 @@ class RecoverNote(View):
         note.out_of_trash()
         note.save()
 
-        return HttpResponseRedirect('/notes/')
+        return HttpResponseRedirect('/notes/trash')
 
 class ToTrashCan(View):
     def post(self, request, pk):

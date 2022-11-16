@@ -12,6 +12,9 @@
         <a href="trash" class="btn btn-outline-dark btn-sm me-2">Корзина</a>
         {% endif %}
 
+        {% if trash %}
+        <a href={% url 'notes:index' %} class="ms-2 btn btn-sm btn-outline-dark">Назад в заметки</a>
+        {% endif %}
         <div class="dropdown">
             <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" id="type-sort-menu" data-bs-toggle="dropdown" aria-expanded="false">
                 Сортировать по
@@ -38,6 +41,7 @@
         {% endif %}
         <a class="flex-grow-1 text-break text-dark ms-2" style="text-decoration: none" href={% url 'notes:note' note.id %}>{{ note.name }}</a>
 
+        {% if not trash %}
         <form method="post" action="{% url 'notes:change_favourites' note.id %}" class="ms-2">
             {% csrf_token %}
             <button type="submit" style="border: none; background: none"><a href=""><i class="fa-regular fa-star"></i></a></button>
@@ -45,10 +49,24 @@
 
         <a href={% url 'notes:note' note.id %} class="ms-2"><i class="fa-regular fa-pen-to-square"></i></a>
 
-        <form method="post" action="{% url 'notes:delete' note.id %}" class="ms-2">
+        <form method="post" action="{% url 'notes:to_trash' note.id %}" class="ms-2">
             {% csrf_token %}
             <button type="submit" style="border: none; background: none"><a href=""><i class="fa-regular fa-trash-can"></i></a></button>
         </form>
+        {% endif %}
+        
+        {% if trash %}
+
+        <form method="post" action="{% url 'notes:recover' note.id %}" class="ms-2">
+            {% csrf_token %}
+            <button type="submit" style="border: none; background: none"><a href=""><i class="fa-regular fa-circle-left"></i></a></button>
+        </form>
+
+        <form method="post" action="{% url 'notes:delete' note.id %}" class="ms-2">
+            {% csrf_token %}
+            <button type="submit" style="border: none; background: none"><a href=""><i class="fa-solid fa-xmark"></i></a></button>
+        </form>
+        {% endif %}
     </div>
 
     
