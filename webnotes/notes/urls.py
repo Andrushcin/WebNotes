@@ -4,8 +4,8 @@ from django.contrib.auth.decorators import login_required
 
 app_name = "notes"
 urlpatterns = [
-    path('', login_required(MyNotes.as_view()), name='index'),
-    path('new', login_required(CreateNote.as_view()), name="new"),
+    path('', MyNotes.as_view(), name='index'),
+    path('new', CreateNote.as_view(), name="new"),
     path('trash', login_required(TrashCanView.as_view()), name="trash"),
     path('<int:pk>', login_required(ChangeNote.as_view()), name="note"),
     path('delete/<int:pk>', login_required(DeleteNote.as_view()), name="delete"),

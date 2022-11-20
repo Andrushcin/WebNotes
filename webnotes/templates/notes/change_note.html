@@ -1,5 +1,4 @@
 {% extends './../layout.html' %}
-{% load crispy_forms_tags %}
 {% block content %}
 
 {% if form.errors %}
@@ -18,7 +17,7 @@
 
 <div class="mx-auto col-xs-12 col-sm-11 col-md-10 col-lg-9 col-xl-7 my-2 p-2">
 
-  <form method="POST" action="" class="" id="edit">
+  <form method="POST" action="" class="mb-2" id="edit">
     {% csrf_token %}
     <fieldset class="form-group">
       <legend class="border-bottom border-warning mb-2">{{ legend }}</legend>
@@ -47,6 +46,9 @@
   {% endif %}
 
   <div class="d-flex flex-row justify-content-end">
+    <div class="me-auto">
+      <a class="btn btn-outline-dark mt-2 align-self-end" href="{% url 'notes:index' %}"><i class="bi bi-arrow-left me-1"></i>Назад</a>
+    </div>
 
     <div class="form-group ms-2">
       <input class="btn btn-primary mt-2 align-self-end" type="submit" value="Сохранить" form="edit">
@@ -66,16 +68,6 @@
   </div>
   {% endif %}
 
-  <!--<form method="POST">
-      {% csrf_token %}
-      <fieldset class="form-group">
-          <legend class="border-bottom mb-4">Новая заметка</legend>
-          {{ form|crispy }}
-      </fieldset>
-      <div class="form-group">
-          <button class="btn btn-light mt-2 align-self-end" type="submit">Сохранить</button>
-      </div>
-  </form>-->
 </div>
 <script>
 var textarea = document.querySelector('textarea');

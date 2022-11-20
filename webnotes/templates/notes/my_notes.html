@@ -3,34 +3,38 @@
 {% block content %}
 
 <div class="m-3 px-2 col-xs-12 col-sm-11 col-md-10 col-lg-9 col-xl-7 mx-auto d-flex flex-column">
-    <div class="my-2 p-2 d-flex flex-row justify-content-between align-items-center border border-warning rounded">
+    <div class="my-2 p-1 d-flex flex-wrap justify-content-md-evenly justify-content-center align-items-center border border-warning rounded">
         {% if not trash %}
-        <a href='new' class="btn btn-outline-dark btn-sm me-2"><i class="fa-solid fa-plus"></i></a>
+        <a href='new' class="btn btn-outline-dark btn-sm me-2">+ Создать</a>
         {% endif %}
 
         {% if not trash %}
-        <a href="trash" class="btn btn-outline-dark btn-sm me-2">Корзина</a>
+        <a href="trash" class="btn btn-outline-dark btn-sm"><i class="bi bi-trash me-1"></i>Корзина</a>
         {% endif %}
 
         {% if trash %}
-        <a href={% url 'notes:index' %} class="ms-2 btn btn-sm btn-outline-dark">Назад в заметки</a>
+        <a href={% url 'notes:index' %} class="btn btn-sm btn-outline-dark"><i class="bi bi-arrow-left me-1"></i>Назад</a>
         {% endif %}
-        <div class="dropdown">
-            <button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" id="type-sort-menu" data-bs-toggle="dropdown" aria-expanded="false">
-                Сортировать по
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="type-sort-menu">
-                {% if not trash %}
-                <li><a class="dropdown-item" href="?sort=date_update">Обновлены недавно</a></li>
-                <li><a class="dropdown-item" href="?sort=-date_update">Обновлены давно</a></li>
-                {% endif %}
-                <li><a class="dropdown-item" href="?sort=date_create">Созданы недавно</a></li>
-                <li><a class="dropdown-item" href="?sort=-date_create">Созданы давно</a></li>
-                <li><a class="dropdown-item" href="?sort=date_missing">Дата удаления</a></li>
-                <li><a class="dropdown-item" href="?sort=-date_missing">Удалены недавно</a></li>
-            </ul>
-        </div>
+        <form action="" class="d-flex justify-content-sm-center m-1">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text" id="basic-addon1"><i class="bi bi-funnel"></i></span>
 
+                <select class="form-select form-control" name="sort">
+                    <option value="date_update" {{ select_param.date_update }}>Дата обновления</option>
+                    <option value="date_create" {{ select_param.date_create }}>Дата создания</option>
+                    {% if trash %}
+                    <option value="date_to_trash" {{ select_param.date_to_trash }}>Дата удаления</option>
+                    {% else %}
+                    <option value="date_to_trash" {{ select_param.date_to_trash }}>Дата автоматич. удаления</option>
+                    {% endif %}
+                </select>
+
+                <input type="checkbox" class="btn-check" id="sort-reverse" autocomplete="off" name="reverse" value="true">
+                <label class="btn btn-outline-dark" for="sort-reverse"><i class="bi bi-arrow-down-up"></i></label>
+
+                <button class="btn btn-outline-dark btn-sm" type="submit">Применить</button>
+            </div>
+        </form>
     </div>
 
 {% for note in notes %}
@@ -44,14 +48,14 @@
         {% if not trash %}
         <form method="post" action="{% url 'notes:change_favourites' note.id %}" class="ms-2">
             {% csrf_token %}
-            <button type="submit" style="border: none; background: none"><a href=""><i class="fa-regular fa-star"></i></a></button>
+            <button type="submit" style="border: none; background: none"><a href=""><i class="bi bi-star"></i></a></button>
         </form>
 
-        <a href={% url 'notes:note' note.id %} class="ms-2"><i class="fa-regular fa-pen-to-square"></i></a>
+        <a href={% url 'notes:note' note.id %} class="ms-2"><i class="bi bi-pencil-square"></i></a>
 
         <form method="post" action="{% url 'notes:to_trash' note.id %}" class="ms-2">
             {% csrf_token %}
-            <button type="submit" style="border: none; background: none"><a href=""><i class="fa-regular fa-trash-can"></i></a></button>
+            <button type="submit" style="border: none; background: none"><a href=""><i class="bi bi-trash"></i></a></button>
         </form>
         {% endif %}
         
@@ -59,12 +63,12 @@
 
         <form method="post" action="{% url 'notes:recover' note.id %}" class="ms-2">
             {% csrf_token %}
-            <button type="submit" style="border: none; background: none"><a href=""><i class="fa-regular fa-circle-left"></i></a></button>
+            <button type="submit" style="border: none; background: none"><a href=""><i class="bi bi-arrow-counterclockwise"></i></a></button>
         </form>
 
         <form method="post" action="{% url 'notes:delete' note.id %}" class="ms-2">
             {% csrf_token %}
-            <button type="submit" style="border: none; background: none"><a href=""><i class="fa-solid fa-xmark"></i></a></button>
+            <button type="submit" style="border: none; background: none"><a href=""><i class="bi bi-x-circle-fill"></i></a></button>
         </form>
         {% endif %}
     </div>
