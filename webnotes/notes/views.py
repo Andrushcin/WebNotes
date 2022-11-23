@@ -28,52 +28,95 @@ def add_data_from_payload(note, payload):
     
     note.save()
     return note
+
+def get_instance(request):
+    if isinstance(get_user(request), AnonymousUser):
+        if request.session.session_key == None:
+            request.session.cycle_key()
+        
+        session = Session.objects.filter(session_key = request.session.session_key)[0]
+        return session
+    else:
+        user = User.objects.get(username=request.user)
+        return user
+
+def get_notes_for_user(instance, sort_params):
+    order_by_param = sort_params["order_by"]
+    if not sort_params["reverse"]:
+        order_by_param = "-" + sort_params["order_by"]
+
+    notes = instance.note_set.all().order_by(order_by_param)
+    
+    return notes
+
+def get_sort_param(request, available_sort_params):
+    params = request.GET
+    reverse = False
+    order_by = 'date_update'
+
+    if 'sort' in params.keys():
+        if params['sort'] in available_sort_params:
+            order_by = params['sort']
+
+    if 'reverse' in params.keys():
+        if params['reverse'] == "true":
+            reverse = True
+    
+    return {"order_by": order_by,
+            "reverse": reverse}
+
+def get_select_param(sort_param, available_sort_params):
+    select_param = {}
+    for var in available_sort_params:
+        if var == sort_param["order_by"]:
+            select_param[var] = "selected"
+        else:
+            select_param[var] = ""
+    return select_param
     
 class MyNotes(View):
-    def post(self, request):
-        pass
     def get(self, request):
         available_sort_params = ['date_update', 'date_create', 'date_to_trash']
-        params = request.GET
-        sort_reverse = False
-        order_by_param = 'date_update'
 
-        if 'sort' in params.keys():
-            if params['sort'] in available_sort_params:
-                order_by_param = params['sort']
-
-        if 'reverse' in params.keys():
-            if params['reverse'] == "true":
-                sort_reverse = True
-
-        select_param = {}
-        for var in available_sort_params:
-            if var == order_by_param:
-                select_param[var] = "selected"
-            else:
-                select_param[var] = ""
-
-        if not sort_reverse:
-            order_by_param = "-" + order_by_param
-
-        if isinstance(get_user(request), AnonymousUser):
-            print(request.session.exists(request.session.session_key))
-            if request.session.session_key == None:
-                request.session.cycle_key()
-            
-            session = Session.objects.filter(session_key = request.session.session_key)[0]
-            notes = session.note_set.all().order_by(order_by_param)
-        else:
-            user = User.objects.get(username=request.user)
-            notes = user.note_set.all().order_by(order_by_param)
+        sort_param = get_sort_param(request, available_sort_params)
+        select_param = get_select_param(sort_param, available_sort_params)
+        instance = get_instance(request)
+        print(request.user)
+        print(instance)
+        notes = get_notes_for_user(instance, sort_param)
 
         current_notes = notes
         current_notes_ids = [n.id for n in current_notes if not n.in_trash()]
         current_notes = notes.filter(id__in=current_notes_ids).values_list('name', 'id', 'favourites', named=True)
         
+        message = ""
+        if isinstance(instance, AnonymousUser):
+            message = "Внимание! Вы не авторизованы в системе, поэтому при завершении сеанса вы потеряете доступ к своим заметкам."
+
         data = {
             'notes': current_notes,
             'select_param':select_param,
+            'message':message,
+            }
+        return render(request, 'notes/my_notes.html', data)
+
+class TrashCanView(View):
+    def get(self, request):
+        available_sort_params = ['date_update', 'date_create', 'date_to_trash']
+
+        sort_param = get_sort_param(request, available_sort_params)
+        select_param = get_select_param(sort_param, available_sort_params)
+        instance = get_instance(request)
+        notes = get_notes_for_user(instance, sort_param)
+
+        missed_notes = notes
+        missed_notes_ids = [n.id for n in missed_notes if n.in_trash()]
+        missed_notes = notes.filter(id__in=missed_notes_ids).values_list('name', 'id', 'favourites', named=True)
+
+        data = {
+            'notes': missed_notes,
+            'select_param':select_param,
+            'trash': True,
             }
         return render(request, 'notes/my_notes.html', data)
 
@@ -82,15 +125,8 @@ class CreateNote(View):
         payload = request.POST.dict()
         note = Note()
 
-        if isinstance(get_user(request), AnonymousUser): 
-            if request.session.session_key == None:
-                request.session.cycle_key()
-                   
-            session = Session.objects.filter(session_key = request.session.session_key)[0]
-            session.note_set.add(add_data_from_payload(note, payload))
-        else:
-            user = User.objects.get(username=request.user)
-            user.note_set.add(add_data_from_payload(note, payload))
+        instance = get_instance(request)
+        instance.note_set.add(add_data_from_payload(note, payload))
         
         return HttpResponseRedirect('/notes/')
     
@@ -101,20 +137,20 @@ class CreateNote(View):
         }
         return render(request, 'notes/change_note.html', data)
 
-
 class ChangeNote(View):
+    
     def post(self, request, pk):
-        payload = request.POST.dict()
-        user = User.objects.get(username=request.user)
-        note = user.note_set.get(id=pk)
+        instance = get_instance(request)
+        note = instance.note_set.get(id=pk)
 
+        payload = request.POST.dict()
         add_data_from_payload(note, payload)
         return HttpResponseRedirect('/notes/')
 
     def get(self, request, pk):
-        user = User.objects.get(username=request.user)
+        instance = get_instance(request)
         try:
-            note = user.note_set.get(id=pk)
+            note = instance.note_set.get(id=pk)
         except Exception as e:
             return HttpResponseNotFound()
         
@@ -126,45 +162,23 @@ class ChangeNote(View):
 
 class DeleteNote(View):
     def post(self, request, pk):
-        user = User.objects.get(username=request.user)
-        note = user.note_set.get(id=pk)
+        instance = get_instance(request)
+        note = instance.note_set.get(id=pk)
         note.delete()
         return HttpResponseRedirect(reverse('notes:trash'))
 
 class ChangeFavourites(View):
     def post(self, request, pk):
-        user = User.objects.get(username=request.user)
-        note = user.note_set.get(id=pk)
+        instance = get_instance(request)
+        note = instance.note_set.get(id=pk)
         note.change_favourites()
         note.save()
         return HttpResponseRedirect('/notes/')
 
-class TrashCanView(View):
-    def get(self, request):
-        try:
-            order_by_param = request.GET['sort']
-            if order_by_param not in ['date_update', '-date_update', 'date_create', '-date_create']:
-                order_by_param = '-date_update'
-        except:
-            order_by_param = '-date_to_trash'
-    
-        user = User.objects.get(username=request.user)
-        notes = user.note_set.all().order_by(order_by_param)
-
-        missed_notes = notes
-        missed_notes_ids = [n.id for n in missed_notes if n.in_trash()]
-        missed_notes = notes.filter(id__in=missed_notes_ids).values_list('name', 'id', 'favourites', named=True)
-
-        data = {
-            'notes': missed_notes,
-            'trash': True,
-            }
-        return render(request, 'notes/my_notes.html', data)
-
 class RecoverNote(View):
     def post(self, request, pk):
-        user = User.objects.get(username=request.user)
-        note = user.note_set.get(id=pk)
+        instance = get_instance(request)
+        note = instance.note_set.get(id=pk)
 
         note.out_of_trash()
         note.save()
@@ -173,8 +187,8 @@ class RecoverNote(View):
 
 class ToTrashCan(View):
     def post(self, request, pk):
-        user = User.objects.get(username=request.user)
-        note = user.note_set.get(id=pk)
+        instance = get_instance(request)
+        note = instance.note_set.get(id=pk)
 
         note.to_trash()
         note.save()

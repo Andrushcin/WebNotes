@@ -1,12 +1,13 @@
 from pathlib import Path
 import os
+from config import SECRET_KEY
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-SECRET_KEY = 'django-insecure-*yamy)e)oh4^d+_7!_)y_)p&noe98s*-ny!kl^2%!)b_rgumf!'
+SECRET_KEY = SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
