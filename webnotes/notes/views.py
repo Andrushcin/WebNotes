@@ -11,6 +11,7 @@ from django.http import HttpResponseBadRequest, HttpResponseNotFound
 from django.contrib.sessions.models import Session
 from django.contrib.auth import get_user
 from django.contrib.sessions.backends.db import SessionStore
+from django.contrib import messages
 
 def add_data_from_payload(note, payload):
     if 'name' in payload.keys():
@@ -81,22 +82,19 @@ class MyNotes(View):
         sort_param = get_sort_param(request, available_sort_params)
         select_param = get_select_param(sort_param, available_sort_params)
         instance = get_instance(request)
-        print(request.user)
-        print(instance)
         notes = get_notes_for_user(instance, sort_param)
 
         current_notes = notes
         current_notes_ids = [n.id for n in current_notes if not n.in_trash()]
         current_notes = notes.filter(id__in=current_notes_ids).values_list('name', 'id', 'favourites', named=True)
         
-        message = ""
-        if isinstance(instance, AnonymousUser):
+        if isinstance(get_user(request), AnonymousUser):
             message = "Внимание! Вы не авторизованы в системе, поэтому при завершении сеанса вы потеряете доступ к своим заметкам."
+            messages.warning(request, message)
 
         data = {
             'notes': current_notes,
             'select_param':select_param,
-            'message':message,
             }
         return render(request, 'notes/my_notes.html', data)
 
