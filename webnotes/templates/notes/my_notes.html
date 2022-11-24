@@ -3,6 +3,14 @@
 {% block content %}
 
 <div class="m-3 px-2 col-xs-12 col-sm-11 col-md-10 col-lg-9 col-xl-7 mx-auto d-flex flex-column">
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
+    
     <div class="my-2 p-1 d-flex flex-wrap justify-content-md-evenly justify-content-center align-items-center border border-warning rounded">
         {% if not trash %}
         <a href='new' class="btn btn-outline-dark btn-sm me-2">+ Создать</a>
@@ -17,7 +25,7 @@
         {% endif %}
         <form action="" class="d-flex justify-content-sm-center m-1">
             <div class="input-group input-group-sm">
-                <span class="input-group-text" id="basic-addon1"><i class="bi bi-funnel"></i></span>
+                <span class="input-group-text"><i class="bi bi-funnel"></i></span>
 
                 <select class="form-select form-control" name="sort">
                     <option value="date_update" {{ select_param.date_update }}>Дата обновления</option>
@@ -39,10 +47,10 @@
 
 {% for note in notes %}
     <div class="my-1 p-2 d-flex flex-row align-items-center border border-dark rounded">
-        <!--<a href={{ note.id }} class="flex-grow-1 text-break" style="text-decoration: none">{{ note.name }}</a>-->
         {% if note.favourites == True %}
             <div class="star me-2"></div>
         {% endif %}
+
         <a class="flex-grow-1 text-break text-dark ms-2" style="text-decoration: none" href={% url 'notes:note' note.id %}>{{ note.name }}</a>
 
         {% if not trash %}
@@ -57,10 +65,8 @@
             {% csrf_token %}
             <button type="submit" style="border: none; background: none"><a href=""><i class="bi bi-trash"></i></a></button>
         </form>
-        {% endif %}
         
-        {% if trash %}
-
+        {% else %}
         <form method="post" action="{% url 'notes:recover' note.id %}" class="ms-2">
             {% csrf_token %}
             <button type="submit" style="border: none; background: none"><a href=""><i class="bi bi-arrow-counterclockwise"></i></a></button>
@@ -72,9 +78,6 @@
         </form>
         {% endif %}
     </div>
-
-    
-
 {% endfor %}
 </div>
 

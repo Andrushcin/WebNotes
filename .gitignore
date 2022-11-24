@@ -1,1 +1,3 @@
 venv/
+webnotes/db.sqlite3
+webnotes/notes/migrations

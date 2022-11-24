@@ -1,13 +1,14 @@
 from pathlib import Path
 import os
-from webnotes.config import SECRET_KEY
+import datetime
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = SECRET_KEY
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 DEBUG = True
-ALLOWED_HOSTS = ["*"]
+
+ALLOWED_HOSTS = ["127.0.0.1"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -74,6 +75,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+SESSION_COOKIE_AGE = datetime.timedelta(days=7).total_seconds()
+
 LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
@@ -97,14 +100,3 @@ LOGIN_REDIRECT_URL = '/notes'
 LOGIN_URL = 'login'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
-# ACCOUNT_EMAIL_UNIQUE = True
-# ACCOUNT_EMAIL_CONFIRMATION_REQUIRED = True
-
-# SITE_ID = 2
-
-# DEFAULT_FROM_EMAIL = 'support@webnotes.ru'
-# EMAIL_HOST = "smtp.yoursmtpserver.ru"
-# EMAIL_PORT = 25
-# EMAIL_HOST_USER = "user"
-# EMAIL_HOST_PASSWORD = "pass"

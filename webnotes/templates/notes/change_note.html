@@ -1,82 +1,75 @@
 {% extends './../layout.html' %}
 {% block content %}
 
-{% if form.errors %}
-  {{ form.errors }}
-  <p class="mx-auto" style="width: max-content">Error has occured. Please try again.</p>
-{% endif %}
-
-{% if next %}
-  {% if user.is_authenticated %}
-    <p class="mx-auto" style="width: max-content">Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-  {% else %}
-    <p class="mx-auto" style="width: max-content">Please login to see this page.</p>
-  {% endif %}
-{% endif %}
-
 <div class="mx-auto col-xs-12 col-sm-11 col-md-10 col-lg-9 col-xl-7 my-2 p-2">
-
-  <form method="POST" action="" class="mb-2" id="edit">
-    {% csrf_token %}
-    <fieldset class="form-group">
-      <legend class="border-bottom border-warning mb-2">{{ legend }}</legend>
-
-      <label for="name-note" class="form-label">Название заметки</label>
-      <input type="text" class="form-control" value="{{ note.name }}" id="name-note" name="name">
-
-      <label for="text-note" class="form-label">Текст заметки</label>
-      <textarea class="form-control" id="text-note" rows="7" name="text" style="overflow: hidden">{{ note.text }}</textarea>
-
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" value="{{ True }}" id="flexCheckDefault" name="favourites" {{ note.favourites_is_checked }}>
-        <label class="form-check-label" for="flexCheckDefault">В избранное</label>
-      </div>
-      <div class="d-flex flex-column">
-        <label for="date" class="form-label">Дата автоматического удаления</label>
-        <input type="datetime-local" id="date" name="date_missing" style="width: 200px" value="{{ note.date_missing_string }}">
-      </div>
-
-    </fieldset>
-  </form>
-  {% if not new %}
-  <form method="post" action="{% url 'notes:delete' note.id %}" class="ms-2" id="delete">
-    {% csrf_token %}
-  </form>
-  {% endif %}
-
-  <div class="d-flex flex-row justify-content-end">
-    <div class="me-auto">
-      <a class="btn btn-outline-dark mt-2 align-self-end" href="{% url 'notes:index' %}"><i class="bi bi-arrow-left me-1"></i>Назад</a>
-    </div>
-
-    <div class="form-group ms-2">
-      <input class="btn btn-primary mt-2 align-self-end" type="submit" value="Сохранить" form="edit">
-    </div>
-
-    {% if not new %}
-    <div class="form-group ms-2">
-      <input class="btn btn-danger mt-2 align-self-end" type="submit" value="Удалить" form="delete">
-    </div>
+	{% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
     {% endif %}
-  </div>
+	
+	<form method="POST" action="" class="mb-2" id="edit">
+		{% csrf_token %}
+		<fieldset class="form-group">
+			<legend class="border-bottom border-warning mb-2">{{ legend }}</legend>
 
-  {% if not new %}
-  <div class="mt-1">
-    <p class="dark">Создано: <span class="fw-bold">{{ note.date_create }}</span> пользователем <span class="fw-bold">{{ note.user }}</span></p>
-    <p class="dark">Последнее изменение: <span class="fw-bold">{{ note.date_update }}</span></p>
-  </div>
-  {% endif %}
+			<label for="name-note" class="form-label">Название заметки</label>
+			<input type="text" class="form-control" value="{{ note.name }}" id="name-note" name="name">
 
+			<label for="text-note" class="form-label">Текст заметки</label>
+			<textarea class="form-control" id="text-note" rows="7" name="text" style="overflow: hidden">{{ note.text }}</textarea>
+
+			<div class="form-check">
+				<input class="form-check-input" type="checkbox" value="{{ True }}" id="check-favourites" name="favourites" {{ note.favourites_is_checked }}>
+				<label class="form-check-label" for="check-favourites">В избранное</label>
+			</div>
+
+			<div class="d-flex flex-column">
+				<label for="date" class="form-label">Дата автоматического удаления</label>
+				<input type="datetime-local" id="date" name="date_missing" style="width: 200px" value="{{ note.date_missing_string }}">
+			</div>
+		</fieldset>
+	</form>
+
+	{% if not new %}
+	<form method="post" action="{% url 'notes:delete' note.id %}" class="ms-2" id="delete">
+		{% csrf_token %}
+	</form>
+	{% endif %}
+
+	<div class="d-flex flex-row justify-content-end">
+		<div class="me-auto">
+			<a class="btn btn-outline-dark mt-2 align-self-end" href="{% url 'notes:index' %}"><i class="bi bi-arrow-left me-1"></i>Назад</a>
+		</div>
+
+		<div class="form-group ms-2">
+			<input class="btn btn-primary mt-2 align-self-end" type="submit" value="Сохранить" form="edit">
+		</div>
+
+		{% if not new %}
+		<div class="form-group ms-2">
+			<input class="btn btn-danger mt-2 align-self-end" type="submit" value="Удалить" form="delete">
+		</div>
+		{% endif %}
+	</div>
+
+	{% if not new %}
+	<div class="mt-1">
+		<p class="dark">Создано: <span class="fw-bold">{{ note.date_create }}</span> пользователем <span class="fw-bold">{{ note.user }}</span></p>
+		<p class="dark">Последнее изменение: <span class="fw-bold">{{ note.date_update }}</span></p>
+	</div>
+	{% endif %}
 </div>
+
 <script>
 var textarea = document.querySelector('textarea');
 textarea.style.height = textarea.scrollHeight + "px";
-
 textarea.addEventListener('keyup', function(){
-  if(this.scrollTop > 0){
-    this.style.height = this.scrollHeight + "px";
-  }
+	if(this.scrollTop > 0){
+		this.style.height = this.scrollHeight + "px";
+	}
 });
 </script>
 {% endblock %}

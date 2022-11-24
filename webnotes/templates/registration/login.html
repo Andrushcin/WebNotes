@@ -1,6 +1,6 @@
 {% extends './../layout.html' %}
-
 {% load crispy_forms_tags %}
+
 {% block content %}
     <div class="mx-auto my-2 px-2 col-xs-12 col-sm-10 col-md-8 col-lg-6 col-xl-4">
         <form method="POST">
@@ -9,12 +9,15 @@
                 <legend class="border-bottom border-warning mb-3">Вход</legend>
                 {{ form|crispy }}
             </fieldset>
+
             <button class="btn btn-primary mt-2" type="submit">Войти</button>
         </form>
+
         <div class="border-top border-warning mt-2 d-flex flex-column">
             <small class="text-muted">
                 Ещё не зарегистрированы? <a class="ml-2" href="/users/register">Регистрация</a>
             </small>
+
             <small class="text-muted">
                 <a class="ml-2" href="/info">Узнайте о функциях сайта WebNotes</a>
             </small>
