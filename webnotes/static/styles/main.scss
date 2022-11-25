@@ -5,20 +5,3 @@ $warning: #EE6C4D;
 $dark: #293241;
 
 @import "../bootstrap-5.0.2/scss/bootstrap.scss";
-
-@import "../bootstrap-5.0.2/scss/functions";
-
-// 2. Include any default variable overrides here
-
-// 3. Include remainder of required Bootstrap stylesheets
-@import "../bootstrap-5.0.2/scss/variables";
-@import "../bootstrap-5.0.2/scss/mixins";
-
-// 4. Include any optional Bootstrap components as you like
-@import "../bootstrap-5.0.2/scss/root";
-@import "../bootstrap-5.0.2/scss/reboot";
-@import "../bootstrap-5.0.2/scss/type";
-@import "../bootstrap-5.0.2/scss/images";
-@import "../bootstrap-5.0.2/scss/containers";
-@import "../bootstrap-5.0.2/scss/grid";
-
