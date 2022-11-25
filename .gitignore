@@ -1,5 +1,4 @@
 venv/
 db.sqlite3
 **/__pycache__
-**/migrations/0001_initial.py
-**/info/admin.py
+0001_initial.py
